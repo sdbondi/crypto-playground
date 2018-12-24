@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Thumbs</title>
+    <style type="text/css">
+      {css}
+    </style>
+  </head>
+
+  <body>
+    HELLO?
+    <div id="elm-app"></div>
+    <script>
+      {js}
+    </script>
+    <script>
+      let app = null;
+      const appNode = document.getElementById('elm-app');
+
+      // Global
+      var rpc = {
+        invoke(cmd) { window.external.invoke(JSON.stringify(cmd)); },
+        init() { rpc.invoke({cmd: 'init'}); },
+        run(payload) {
+          app = Elm.Main.init({
+            flags: payload,
+            node: appNode,
+          });
+
+          console.log("init ports")
+          console.log(app.ports);
+          app.ports.increment.subscribe(([model, n]) => {
+            console.log("port called inc")
+            rpc.invoke({cmd: "increment", count: n})  
+          });
+          app.ports.decrement.subscribe(([model, n]) => {
+            console.log("port called dec")
+            rpc.invoke({cmd: "decrement", count: n})  
+          });
+        }
+      };
+
+      window.onload = () => { rpc.init(); };
+    </script>
+  </body>
+</html>
